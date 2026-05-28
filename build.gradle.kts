@@ -11,7 +11,7 @@ repositories {
 }
 
 val jacksonVersion = "2.17.2"
-val camundaVersion = "8.9.0"
+val camundaVersion = "8.8.0"
 val rabbitmqVersion = "5.22.0"
 
 dependencies {
