@@ -12,7 +12,6 @@ import java.util.concurrent.CountDownLatch;
 
 /**
  * Camunda Job Worker fuer den Service Task "Zahlungsauftrag erzeugen".
- *
  * In Camunda muss beim Service Task dieser Job Type eingetragen werden:
  * zahlungsauftrag-erzeugen
  */
@@ -24,7 +23,7 @@ public final class ZahlungsauftragCamundaWorker {
     private ZahlungsauftragCamundaWorker() {
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    static void main() throws InterruptedException {
         Properties camundaCredentials = ladeCamundaCredentials();
 
         try (
@@ -33,11 +32,17 @@ public final class ZahlungsauftragCamundaWorker {
                         .withClientId(camundaCredentials.getProperty("camunda.client.auth.client-id"))
                         .withClientSecret(camundaCredentials.getProperty("camunda.client.auth.client-secret"))
                         .withRegion(camundaCredentials.getProperty("camunda.client.cloud.region"))
-                        .build();
-                JobWorker worker = new ZahlungsauftragWorker().open(camundaClient)
+                        .preferRestOverGrpc(false)
+                        .build()
         ) {
-            System.out.printf("Job Worker gestartet und wartet auf Jobs vom Typ: %s%n", JOB_TYPE);
-            new CountDownLatch(1).await();
+            System.out.println("Teste Camunda Cloud Verbindung...");
+            camundaClient.newTopologyRequest().send().join();
+            System.out.println("Camunda Cloud Verbindung OK.");
+
+            try (JobWorker ignored = new ZahlungsauftragWorker().open(camundaClient)) {
+                System.out.printf("Job Worker gestartet und wartet auf Jobs vom Typ: %s%n", JOB_TYPE);
+                new CountDownLatch(1).await();
+            }
         }
     }
 
