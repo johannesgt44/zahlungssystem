@@ -56,6 +56,10 @@ Nach erfolgreichem Publish schreibt der Worker diese Prozessvariablen:
 }
 ```
 
+Der Zahlungsservice verhindert doppelte Verarbeitung pro laufendem Prozess anhand der `rechnungsNummer`.
+Falls diese leer ist, wird `rechnungsId` als technischer Fallback genutzt.
+Die Liste ist in-memory: Nach einem Neustart ist sie leer und bei mehreren Service-Instanzen nicht instanzuebergreifend geteilt.
+
 ## Verfuegbare Gradle-Tasks
 
 - `.\gradlew.bat runZahlungService` startet den RabbitMQ-Consumer
